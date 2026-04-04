@@ -265,7 +265,7 @@
         const btn = document.querySelector('.btn-action');
         btn.innerText = 'PROCESSING...';
         try {
-            const r = await fetch('http://127.0.0.1:8000/predict/earthquake', {
+            const r = await fetch('https://crisis-radar-api.onrender.com/predict/earthquake', {
                 method: 'POST', headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                     latitude: parseFloat(document.getElementById('lat').value),
@@ -284,7 +284,7 @@
     }
 
     // 2. Seismic Map + Chart
-    fetch('http://127.0.0.1:8000/earthquake/data')
+    fetch('https://crisis-radar-api.onrender.com/earthquake/data')
         .then(r => r.json())
         .then(data => {
             Plotly.newPlot('main-map', [{
@@ -311,7 +311,7 @@
         });
 
     // 3. Nuclear Risk
-    fetch('http://127.0.0.1:8000/nuclear/data')
+    fetch('https://crisis-radar-api.onrender.com/nuclear/data')
         .then(r => r.json())
         .then(data => {
             Plotly.newPlot('nuclear-map', [{
@@ -327,7 +327,7 @@
         });
 
     // 4. Conflict Risk
-    fetch('http://127.0.0.1:8000/conflict/data')
+    fetch('https://crisis-radar-api.onrender.com/conflict/data')
         .then(r => r.json())
         .then(data => {
             Plotly.newPlot('conflict-map', [{
@@ -343,7 +343,7 @@
         });
 
     // 5. EM-DAT
-    fetch('http://127.0.0.1:8000/emdat/data')
+    fetch('https://crisis-radar-api.onrender.com/emdat/data')
         .then(r => r.json())
         .then(data => {
             Plotly.newPlot('emdat-chart', [{
@@ -359,7 +359,7 @@
         });
 
     // 6. Final Risk
-    fetch('http://127.0.0.1:8000/risk/composite')
+    fetch('https://crisis-radar-api.onrender.com/risk/composite')
         .then(r => r.json())
         .then(data => {
             Plotly.newPlot('final-bar', [{
@@ -380,7 +380,7 @@
         });
 
     // 7. Live News
-    fetch('http://127.0.0.1:8000/news/risk')
+    fetch('https://crisis-radar-api.onrender.com/news/risk')
         .then(r => r.json())
         .then(data => {
             const container = document.getElementById('news-container');
@@ -406,7 +406,7 @@
         input.value = '';
         document.getElementById('spinner').style.display = 'block';
         try {
-            const r = await fetch('http://127.0.0.1:8000/chat', {
+            const r = await fetch('https://crisis-radar-api.onrender.com/chat', {
                 method: 'POST', headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ message: text, history: chatHistory })
             });
