@@ -200,37 +200,53 @@ def get_emdat_data():
 
 @app.get("/conflict/gdelt")
 def get_gdelt_data():
-    import zipfile, io, requests as req
+    import zipfile, io
+    import requests as req
     from datetime import datetime, timedelta
     
-    try:
-        yesterday = (datetime.now() - timedelta(days=1)).strftime("%Y%m%d")
-        url = f"http://data.gdeltproject.org/events/{yesterday}.export.CSV.zip"
-        
-        r = req.get(url, timeout=30)
-        z = zipfile.ZipFile(io.BytesIO(r.content))
-        csv_name = z.namelist()[0]
-        
-        df = pd.read_csv(z.open(csv_name), sep='\t', header=None)
-        df['lat'] = pd.to_numeric(df[46], errors='coerce')
-        df['lon'] = pd.to_numeric(df[47], errors='coerce')
-        df['goldstein'] = pd.to_numeric(df[30], errors='coerce')
-        df['num_mentions'] = pd.to_numeric(df[31], errors='coerce')
-        df['country'] = df[44]
-        
-        df = df.dropna(subset=['lat', 'lon', 'goldstein'])
-        df = df[df['lat'].between(-90, 90) & df['lon'].between(-180, 180)]
-        df_conflict = df[df['goldstein'] < 0].sample(min(2000, len(df)))
-        
-        return {
-            'lats': df_conflict['lat'].tolist(),
-            'lons': df_conflict['lon'].tolist(),
-            'goldstein': df_conflict['goldstein'].tolist(),
-            'num_mentions': df_conflict['num_mentions'].fillna(1).tolist(),
-            'country': df_conflict['country'].fillna('Unknown').tolist()
-        }
-    except Exception as e:
-        return {"error": str(e)}
+    # Try last 3 days
+    for days_back in range(1, 4):
+        try:
+            date = (datetime.now() - timedelta(days=days_back)).strftime("%Y%m%d")
+            url = f"http://data.gdeltproject.org/events/{date}.export.CSV.zip"
+            
+            r = req.get(url, timeout=60)
+            if r.status_code != 200:
+                continue
+                
+            z = zipfile.ZipFile(io.BytesIO(r.content))
+            csv_name = z.namelist()[0]
+            
+            df = pd.read_csv(z.open(csv_name), sep='\t', header=None, low_memory=False)
+            
+            df['lat'] = pd.to_numeric(df[46], errors='coerce')
+            df['lon'] = pd.to_numeric(df[47], errors='coerce')
+            df['goldstein'] = pd.to_numeric(df[30], errors='coerce')
+            df['num_mentions'] = pd.to_numeric(df[31], errors='coerce')
+            df['country'] = df[44].fillna('Unknown')
+            
+            df = df.dropna(subset=['lat', 'lon', 'goldstein'])
+            df = df[df['lat'].between(-90, 90) & df['lon'].between(-180, 180)]
+            df_conflict = df[df['goldstein'] < 0]
+            
+            if len(df_conflict) == 0:
+                continue
+                
+            df_sample = df_conflict.sample(min(2000, len(df_conflict)))
+            
+            return {
+                'lats': df_sample['lat'].tolist(),
+                'lons': df_sample['lon'].tolist(),
+                'goldstein': df_sample['goldstein'].tolist(),
+                'num_mentions': df_sample['num_mentions'].fillna(1).tolist(),
+                'country': df_sample['country'].tolist(),
+                'total_events': len(df_conflict),
+                'date': date
+            }
+        except Exception as e:
+            continue
+    
+    return {"error": "GDELT unavailable", "lats": [], "lons": [], "goldstein": [], "num_mentions": [], "country": []}
 
 @app.get("/risk/composite")
 def get_composite_risk():
