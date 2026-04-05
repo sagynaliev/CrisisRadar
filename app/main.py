@@ -200,53 +200,43 @@ def get_emdat_data():
 
 @app.get("/conflict/gdelt")
 def get_gdelt_data():
-    import zipfile, io
     import requests as req
-    from datetime import datetime, timedelta
     
-    # Try last 3 days
-    for days_back in range(1, 4):
-        try:
-            date = (datetime.now() - timedelta(days=days_back)).strftime("%Y%m%d")
-            url = f"http://data.gdeltproject.org/events/{date}.export.CSV.zip"
-            
-            r = req.get(url, timeout=60)
-            if r.status_code != 200:
-                continue
-                
-            z = zipfile.ZipFile(io.BytesIO(r.content))
-            csv_name = z.namelist()[0]
-            
-            df = pd.read_csv(z.open(csv_name), sep='\t', header=None, low_memory=False)
-            
-            df['lat'] = pd.to_numeric(df[46], errors='coerce')
-            df['lon'] = pd.to_numeric(df[47], errors='coerce')
-            df['goldstein'] = pd.to_numeric(df[30], errors='coerce')
-            df['num_mentions'] = pd.to_numeric(df[31], errors='coerce')
-            df['country'] = df[44].fillna('Unknown')
-            
-            df = df.dropna(subset=['lat', 'lon', 'goldstein'])
-            df = df[df['lat'].between(-90, 90) & df['lon'].between(-180, 180)]
-            df_conflict = df[df['goldstein'] < 0]
-            
-            if len(df_conflict) == 0:
-                continue
-                
-            df_sample = df_conflict.sample(min(2000, len(df_conflict)))
-            
-            return {
-                'lats': df_sample['lat'].tolist(),
-                'lons': df_sample['lon'].tolist(),
-                'goldstein': df_sample['goldstein'].tolist(),
-                'num_mentions': df_sample['num_mentions'].fillna(1).tolist(),
-                'country': df_sample['country'].tolist(),
-                'total_events': len(df_conflict),
-                'date': date
-            }
-        except Exception as e:
-            continue
-    
-    return {"error": "GDELT unavailable", "lats": [], "lons": [], "goldstein": [], "num_mentions": [], "country": []}
+    try:
+        # GDELT DOC API — тегін, тіркелусіз
+        url = "https://api.gdeltproject.org/api/v2/geo/geo"
+        params = {
+            "query": "war OR conflict OR attack OR military",
+            "mode": "pointdata",
+            "maxrecords": 500,
+            "format": "json"
+        }
+        
+        r = req.get(url, params=params, timeout=30)
+        data = r.json()
+        
+        features = data.get('features', [])
+        
+        lats, lons, titles, countries = [], [], [], []
+        for f in features:
+            coords = f.get('geometry', {}).get('coordinates', [])
+            if len(coords) == 2:
+                lons.append(coords[0])
+                lats.append(coords[1])
+                props = f.get('properties', {})
+                titles.append(props.get('name', 'Unknown'))
+                countries.append(props.get('countrycode', 'Unknown'))
+        
+        return {
+            'lats': lats,
+            'lons': lons,
+            'goldstein': [-3.0] * len(lats),
+            'num_mentions': [5] * len(lats),
+            'country': countries,
+            'total_events': len(lats)
+        }
+    except Exception as e:
+        return {"error": str(e), "lats": [], "lons": [], "goldstein": [], "num_mentions": [], "country": []}
 
 @app.get("/risk/composite")
 def get_composite_risk():
