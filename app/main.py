@@ -158,14 +158,79 @@ def get_conflict_data():
 
 @app.get("/emdat/data")
 def get_emdat_data():
-    return {
-        'disaster_type': ['Flood', 'Earthquake', 'Storm', 'Drought',
-                         'Wildfire', 'Tsunami', 'Volcanic', 'Extreme Temp'],
-        'events': [450, 320, 280, 150, 200, 45, 30, 180],
-        'total_deaths': [8900, 45000, 12000, 25000, 3400, 2100, 890, 6700],
-        'affected_millions': [120, 45, 67, 890, 12, 3, 1.5, 34],
-        'economic_loss_billion': [180, 320, 250, 95, 78, 45, 12, 67]
-    }
+    import urllib.parse
+    import requests as req
+    
+    try:
+        name = "Natural disasters (EMDAT)"
+        encoded = urllib.parse.quote(name)
+        url = f"https://raw.githubusercontent.com/owid/owid-datasets/master/datasets/{encoded}/{encoded}.csv"
+        
+        df = pd.read_csv(url)
+        df_recent = df[df['Year'] >= 2000]
+        
+        disaster_deaths = {
+            'Earthquake': float(df_recent['deaths_earthquake'].sum()),
+            'Flood': float(df_recent['deaths_flood'].sum()),
+            'Storm': float(df_recent['deaths_storm'].sum()),
+            'Drought': float(df_recent['deaths_drought'].sum()),
+            'Wildfire': float(df_recent['deaths_wildfire'].sum()),
+            'Landslide': float(df_recent['deaths_landslide'].sum()),
+            'Volcanic': float(df_recent['deaths_volcanic'].sum()),
+            'Extreme Temp': float(df_recent['deaths_temperature'].sum()),
+        }
+        
+        disaster_damages = {
+            'Earthquake': float(df_recent['total_damages_earthquake'].sum()),
+            'Flood': float(df_recent['total_damages_flood'].sum()),
+            'Storm': float(df_recent['total_damages_storm'].sum()),
+            'Drought': float(df_recent['total_damages_drought'].sum()),
+            'Wildfire': float(df_recent['total_damages_wildfire'].sum()),
+        }
+        
+        return {
+            'disaster_type': list(disaster_deaths.keys()),
+            'total_deaths': list(disaster_deaths.values()),
+            'events': [450, 320, 280, 150, 200, 45, 30, 180],
+            'affected_millions': [120, 45, 67, 890, 12, 3, 1.5, 34],
+            'economic_loss_billion': list(disaster_damages.values()) + [0, 0, 0]
+        }
+    except Exception as e:
+        return {"error": str(e)}
+
+@app.get("/conflict/gdelt")
+def get_gdelt_data():
+    import zipfile, io, requests as req
+    from datetime import datetime, timedelta
+    
+    try:
+        yesterday = (datetime.now() - timedelta(days=1)).strftime("%Y%m%d")
+        url = f"http://data.gdeltproject.org/events/{yesterday}.export.CSV.zip"
+        
+        r = req.get(url, timeout=30)
+        z = zipfile.ZipFile(io.BytesIO(r.content))
+        csv_name = z.namelist()[0]
+        
+        df = pd.read_csv(z.open(csv_name), sep='\t', header=None)
+        df['lat'] = pd.to_numeric(df[46], errors='coerce')
+        df['lon'] = pd.to_numeric(df[47], errors='coerce')
+        df['goldstein'] = pd.to_numeric(df[30], errors='coerce')
+        df['num_mentions'] = pd.to_numeric(df[31], errors='coerce')
+        df['country'] = df[44]
+        
+        df = df.dropna(subset=['lat', 'lon', 'goldstein'])
+        df = df[df['lat'].between(-90, 90) & df['lon'].between(-180, 180)]
+        df_conflict = df[df['goldstein'] < 0].sample(min(2000, len(df)))
+        
+        return {
+            'lats': df_conflict['lat'].tolist(),
+            'lons': df_conflict['lon'].tolist(),
+            'goldstein': df_conflict['goldstein'].tolist(),
+            'num_mentions': df_conflict['num_mentions'].fillna(1).tolist(),
+            'country': df_conflict['country'].fillna('Unknown').tolist()
+        }
+    except Exception as e:
+        return {"error": str(e)}
 
 @app.get("/risk/composite")
 def get_composite_risk():
