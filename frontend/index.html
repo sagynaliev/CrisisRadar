@@ -327,42 +327,39 @@
         });
 
 // Conflict Risk — GDELT Real Data
-fetch('https://crisis-radar-api.onrender.com/conflict/gdelt')
+fetch('https://crisis-radar-api.onrender.com/conflict/data')
     .then(r => r.json())
     .then(data => {
-        if (!data.lats || data.lats.length === 0) throw new Error('No data');
-        
         Plotly.newPlot('conflict-map', [{
             type: 'scattergeo',
-            lat: data.lats,
-            lon: data.lons,
+            lat: data.latitude,
+            lon: data.longitude,
             mode: 'markers',
             marker: {
-                size: data.num_mentions.map(m => Math.min(Math.max(m, 2), 15)),
-                color: data.goldstein,
-                colorscale: 'Reds_r',
+                size: data.risk_score.map(s => s / 5),
+                color: data.risk_score,
+                colorscale: 'Reds',
                 showscale: true,
-                opacity: 0.7
+                opacity: 0.8
             },
-            text: data.country.map((c, i) => `${c}: intensity ${data.goldstein[i].toFixed(1)}`)
+            text: data.country.map((c, i) => `${c}: ${data.conflict_events[i].toLocaleString()} events`)
         }], { ...baseLayout, geo: geoBase, margin: {t:0,b:0,l:0,r:0} });
-
-        const countryCounts = {};
-        data.country.forEach(c => { countryCounts[c] = (countryCounts[c] || 0) + 1; });
-        const sorted = Object.entries(countryCounts).sort((a,b) => b[1]-a[1]).slice(0,10);
 
         Plotly.newPlot('conflict-chart', [{
             type: 'bar',
-            x: sorted.map(d => d[1]),
-            y: sorted.map(d => d[0]),
+            x: data.conflict_events,
+            y: data.country,
             orientation: 'h',
-            marker: { color: sorted.map(d => d[1]), colorscale: 'Reds' },
-            text: sorted.map(d => d[1]),
+            marker: { color: data.conflict_events, colorscale: 'Reds' },
+            text: data.conflict_events.map(v => v.toLocaleString()),
             textposition: 'outside'
-        }], { ...baseLayout, margin: {t:20,b:40,l:60,r:60}, xaxis: {title:'Conflict Events'} });
+        }], { ...baseLayout,
+              margin: {t:20,b:40,l:120,r:80},
+              xaxis: { title: 'Conflict Events' } });
     })
     .catch(() => {
-        document.getElementById('conflict-map').innerHTML = '<p style="color:gray;padding:20px;">GDELT data unavailable</p>';
+        document.getElementById('conflict-map').innerHTML =
+            '<p style="color:gray;padding:20px;">⚠️ Деректер қолжетімсіз</p>';
     });
 
 // EM-DAT — Real Data
