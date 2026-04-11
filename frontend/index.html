@@ -46,6 +46,20 @@
         }
         @keyframes statusPulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
         .live-tag { font-family: var(--font-mono); font-size: 0.6rem; color: var(--accent); animation: statusPulse 2s infinite; }
+        
+        /* Filter Styles */
+        .filter-bar {
+            display: flex; gap: 10px; padding: 15px 40px; background: var(--bg);
+            border-bottom: 1px solid var(--border); flex-wrap: wrap;
+        }
+        .filter-btn {
+            background: transparent; border: 1px solid var(--border); color: var(--text-muted);
+            padding: 8px 18px; border-radius: 20px; cursor: pointer; font-family: var(--font-mono);
+            font-size: 0.85rem; transition: all 0.3s ease; display: flex; align-items: center; gap: 6px;
+        }
+        .filter-btn:hover { border-color: var(--accent); color: var(--text); }
+        .filter-btn.active { background: var(--accent); color: white; border-color: var(--accent); }
+
         .container { max-width: 1400px; margin: 40px auto; padding: 0 20px; }
         .top-stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 20px; margin-bottom: 40px; }
         .stat-card { background: var(--card); border: 1px solid var(--border); padding: 25px; border-radius: var(--radius); transition: border-color 0.3s; }
@@ -68,24 +82,16 @@
             transition: opacity 0.2s, box-shadow 0.2s;
         }
         .btn-action:hover { opacity: 0.85; box-shadow: 0 0 20px var(--accent-glow); }
-        .result-panel {
-            display: none; margin-top: 20px;
-            border: 1px solid var(--accent); border-radius: 8px; padding: 20px;
-            background: rgba(255,0,0,0.05);
-        }
+        .result-panel { display: none; margin-top: 20px; border: 1px solid var(--accent); border-radius: 8px; padding: 20px; background: rgba(255,0,0,0.05); }
         .result-mag { font-family: var(--font-display); font-size: 3.5rem; color: var(--accent); }
         .result-risk { font-family: var(--font-mono); font-size: 0.85rem; margin: 8px 0; }
         .result-conf { font-family: var(--font-mono); font-size: 0.75rem; color: var(--text-muted); }
-        .chat-history { height: 320px; overflow-y: auto; margin-bottom: 15px; display: flex; flex-direction: column; gap: 10px; padding-right: 5px; }
         .msg { padding: 12px 16px; border-radius: 10px; font-size: 0.9rem; max-width: 80%; line-height: 1.5; white-space: pre-wrap; }
         .msg-user { background: var(--accent); color: white; align-self: flex-end; }
         .msg-ai { background: var(--surface); border: 1px solid var(--border); align-self: flex-start; }
         .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
         .news-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 16px; }
-        .news-card {
-            background: var(--surface); border: 1px solid var(--border);
-            border-radius: 10px; padding: 16px; cursor: pointer; transition: border-color 0.3s;
-        }
+        .news-card { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 16px; cursor: pointer; transition: border-color 0.3s; }
         .news-card:hover { border-color: var(--accent); }
         .news-source { font-family: var(--font-mono); font-size: 0.65rem; color: var(--accent); margin-bottom: 8px; text-transform: uppercase; }
         .news-title { font-size: 0.88rem; line-height: 1.5; }
@@ -107,46 +113,52 @@
     </div>
 </nav>
 
-<div class="container">
-    <!-- Stats -->
-<div class="top-stats">
-    <div class="stat-card" style="border-left: 3px solid #ff0000;">
-        <div class="stat-label">Seismic Threat</div>
-        <div class="stat-val" style="color:#ff0000;">HIGH</div>
-        <div style="font-family:var(--font-mono);font-size:0.65rem;color:var(--text-muted);margin-top:5px;">5,000+ events monitored</div>
-        <div style="margin-top:10px;height:4px;background:var(--border);border-radius:2px;">
-            <div style="width:85%;height:100%;background:#ff0000;border-radius:2px;"></div>
-        </div>
-    </div>
-    <div class="stat-card" style="border-left: 3px solid #ff6600;">
-        <div class="stat-label">Nuclear Threat</div>
-        <div class="stat-val" style="color:#ff6600;">ELEVATED</div>
-        <div style="font-family:var(--font-mono);font-size:0.65rem;color:var(--text-muted);margin-top:5px;">10 nations monitored</div>
-        <div style="margin-top:10px;height:4px;background:var(--border);border-radius:2px;">
-            <div style="width:64%;height:100%;background:#ff6600;border-radius:2px;"></div>
-        </div>
-    </div>
-    <div class="stat-card" style="border-left: 3px solid #ffaa00;">
-        <div class="stat-label">Conflict Threat</div>
-        <div class="stat-val" style="color:#ffaa00;">MODERATE</div>
-        <div style="font-family:var(--font-mono);font-size:0.65rem;color:var(--text-muted);margin-top:5px;">10 active conflict zones</div>
-        <div style="margin-top:10px;height:4px;background:var(--border);border-radius:2px;">
-            <div style="width:61%;height:100%;background:#ffaa00;border-radius:2px;"></div>
-        </div>
-    </div>
-    <div class="stat-card" style="border-left: 3px solid #ff4444;">
-        <div class="stat-label">Climate Threat</div>
-        <div class="stat-val" style="color:#ff4444;">CRITICAL</div>
-        <div style="font-family:var(--font-mono);font-size:0.65rem;color:var(--text-muted);margin-top:5px;">8 disaster categories</div>
-        <div style="margin-top:10px;height:4px;background:var(--border);border-radius:2px;">
-            <div style="width:70%;height:100%;background:#ff4444;border-radius:2px;"></div>
-        </div>
-    </div>
+<div class="filter-bar">
+    <button class="filter-btn active" data-filter="all" onclick="applyFilter('all')">🌍 All</button>
+    <button class="filter-btn" data-filter="earthquake" onclick="applyFilter('earthquake')">🌋 Earthquake</button>
+    <button class="filter-btn" data-filter="conflict" onclick="applyFilter('conflict')">⚔️ Conflict</button>
+    <button class="filter-btn" data-filter="nuclear" onclick="applyFilter('nuclear')">☢️ Nuclear</button>
+    <button class="filter-btn" data-filter="disaster" onclick="applyFilter('disaster')">🌪️ Disaster</button>
 </div>
 
+<div class="container">
+    <div class="top-stats">
+        <div class="stat-card" style="border-left: 3px solid #ff0000;">
+            <div class="stat-label">Seismic Threat</div>
+            <div class="stat-val" style="color:#ff0000;">HIGH</div>
+            <div style="font-family:var(--font-mono);font-size:0.65rem;color:var(--text-muted);margin-top:5px;">5,000+ events monitored</div>
+            <div style="margin-top:10px;height:4px;background:var(--border);border-radius:2px;">
+                <div style="width:85%;height:100%;background:#ff0000;border-radius:2px;"></div>
+            </div>
+        </div>
+        <div class="stat-card" style="border-left: 3px solid #ff6600;">
+            <div class="stat-label">Nuclear Threat</div>
+            <div class="stat-val" style="color:#ff6600;">ELEVATED</div>
+            <div style="font-family:var(--font-mono);font-size:0.65rem;color:var(--text-muted);margin-top:5px;">10 nations monitored</div>
+            <div style="margin-top:10px;height:4px;background:var(--border);border-radius:2px;">
+                <div style="width:64%;height:100%;background:#ff6600;border-radius:2px;"></div>
+            </div>
+        </div>
+        <div class="stat-card" style="border-left: 3px solid #ffaa00;">
+            <div class="stat-label">Conflict Threat</div>
+            <div class="stat-val" style="color:#ffaa00;">MODERATE</div>
+            <div style="font-family:var(--font-mono);font-size:0.65rem;color:var(--text-muted);margin-top:5px;">10 active conflict zones</div>
+            <div style="margin-top:10px;height:4px;background:var(--border);border-radius:2px;">
+                <div style="width:61%;height:100%;background:#ffaa00;border-radius:2px;"></div>
+            </div>
+        </div>
+        <div class="stat-card" style="border-left: 3px solid #ff4444;">
+            <div class="stat-label">Climate Threat</div>
+            <div class="stat-val" style="color:#ff4444;">CRITICAL</div>
+            <div style="font-family:var(--font-mono);font-size:0.65rem;color:var(--text-muted);margin-top:5px;">8 disaster categories</div>
+            <div style="margin-top:10px;height:4px;background:var(--border);border-radius:2px;">
+                <div style="width:70%;height:100%;background:#ff4444;border-radius:2px;"></div>
+            </div>
+        </div>
+    </div>
+
     <div class="main-grid">
-        <!-- Prediction -->
-        <div class="card">
+        <div class="card" id="card-forecast">
             <h2>Seismic Forecast</h2>
             <div class="input-group"><label>Latitude</label><input type="number" id="lat" value="43.2" step="0.1"></div>
             <div class="input-group"><label>Longitude</label><input type="number" id="lon" value="76.8" step="0.1"></div>
@@ -160,20 +172,17 @@
             </div>
         </div>
 
-        <!-- Chart -->
-        <div class="card">
+        <div class="card" id="card-seismic">
             <h2>Magnitude Distribution</h2>
             <div id="seismic-chart" style="height:350px;"></div>
         </div>
 
-        <!-- Main Map -->
-        <div class="card full">
+        <div class="card full" id="card-mainmap">
             <h2>Global Seismic Surveillance Map</h2>
             <div id="main-map" style="height:500px;"></div>
         </div>
 
-        <!-- Nuclear Risk -->
-        <div class="card full">
+        <div class="card full" id="card-nuclear">
             <h2>Global Nuclear Risk Index</h2>
             <div class="two-col">
                 <div id="nuclear-map" style="height:400px;"></div>
@@ -181,8 +190,7 @@
             </div>
         </div>
 
-        <!-- Conflict Risk -->
-        <div class="card full">
+        <div class="card full" id="card-conflict">
             <h2>Global Conflict Risk (WW3 Index)</h2>
             <div class="two-col">
                 <div id="conflict-map" style="height:400px;"></div>
@@ -190,8 +198,7 @@
             </div>
         </div>
 
-        <!-- EM-DAT -->
-        <div class="card full">
+        <div class="card full" id="card-emdat">
             <h2>Natural Disasters — EM-DAT</h2>
             <div class="two-col">
                 <div id="emdat-chart" style="height:400px;"></div>
@@ -199,8 +206,7 @@
             </div>
         </div>
 
-        <!-- Final Risk -->
-        <div class="card full">
+        <div class="card full" id="card-final">
             <h2>Final Global Risk Assessment</h2>
             <div class="two-col">
                 <div id="final-bar" style="height:450px;"></div>
@@ -208,24 +214,45 @@
             </div>
         </div>
 
-        <!-- Live News -->
-        <div class="card full">
+        <div class="card full" id="card-news">
             <h2>Live Crisis News Feed</h2>
             <div class="news-grid" id="news-container"></div>
         </div>
+    </div>
+</div>
 
-        <!-- AI Chat -->
-        <div class="card full">
-            <h2>Crisis AI Assistant</h2>
-            <div class="chat-history" id="chat-messages">
-                <div class="msg msg-ai">Tactical Intelligence Unit ready. Ask anything about global catastrophic risks.</div>
-            </div>
-            <div style="display:flex;gap:10px;align-items:center;">
-                <input type="text" id="chat-input" placeholder="Type your intelligence query..." onkeypress="if(event.key==='Enter') sendMessage()">
-                <div class="spinner" id="spinner"></div>
-                <button class="btn-action" style="width:100px;" onclick="sendMessage()">SEND</button>
-            </div>
-        </div>
+<button id="chat-toggle" onclick="toggleChat()" 
+   style="position:fixed; bottom:30px; right:30px; z-index:999; 
+          width:56px; height:56px; border-radius:50%; 
+          background:var(--accent); border:none; cursor:pointer; 
+          font-size:24px; box-shadow:0 4px 20px var(--accent-glow);
+          display:flex; align-items:center; justify-content:center; color:white; transition: 0.3s;">
+  💬
+</button>
+
+<div id="chat-modal" style="display:none; position:fixed; bottom:100px; right:30px; 
+     width:360px; height:500px; background:var(--card); 
+     border:1px solid var(--accent); border-radius:16px; 
+     z-index:998; flex-direction:column; overflow:hidden;
+     box-shadow: 0 10px 30px rgba(0,0,0,0.5);">
+    
+    <div style="padding:16px; background:var(--surface); border-bottom:1px solid var(--border); font-family:var(--font-display); font-size:1.2rem; color:var(--accent); display:flex; justify-content:space-between;">
+        ⚡ CRISIS AI
+        <span onclick="toggleChat()" style="cursor:pointer; color:var(--text-muted);">✕</span>
+    </div>
+    
+    <div id="chat-messages" style="flex:1; overflow-y:auto; padding:16px; display:flex; flex-direction:column; gap:10px;">
+        <div class="msg msg-ai">Tactical Intelligence Unit ready. Ask anything about global catastrophic risks.</div>
+    </div>
+    
+    <div style="padding:12px; display:flex; gap:8px; border-top:1px solid var(--border); background:var(--surface); align-items:center;">
+        <input id="chat-input" type="text" placeholder="Ask about crisis data..." 
+               onkeypress="if(event.key==='Enter') sendMessage()" 
+               style="flex:1; background:var(--bg); border:1px solid var(--border); color:var(--text); padding:10px; border-radius:8px; outline:none; font-family:var(--font-mono); font-size:0.8rem;">
+        <div class="spinner" id="spinner"></div>
+        <button onclick="sendMessage()" class="btn-action" style="width:70px; padding:10px; font-size:1rem; border-radius:8px;">
+            SEND
+        </button>
     </div>
 </div>
 
@@ -259,6 +286,48 @@
     };
 
     const geoBase = { bgcolor: BG, landcolor: LAND, showland: true, showocean: true, oceancolor: isDark ? '#0a0a0a' : '#c8d8e8' };
+
+    // --- FILTER SYSTEM LOGIC ---
+    // Карточкалардың ID-лерін осы жерге бекіттік, UI бұзылмас үшін
+    const allCards = ['card-forecast', 'card-seismic', 'card-mainmap', 'card-nuclear', 'card-conflict', 'card-emdat', 'card-final', 'card-news'];
+    
+    const sections = {
+        earthquake: ['card-forecast', 'card-seismic', 'card-mainmap'],
+        conflict:   ['card-conflict'],
+        nuclear:    ['card-nuclear'],
+        disaster:   ['card-emdat'],
+        all:        allCards
+    };
+
+    function applyFilter(type) {
+        // Барлық карточкаларды жасыру
+        allCards.forEach(id => {
+            const el = document.getElementById(id);
+            if (el) el.style.display = 'none';
+        });
+        
+        // Тек таңдалған карточкаларды көрсету
+        sections[type].forEach(id => {
+            const el = document.getElementById(id);
+            if (el) el.style.display = 'block';
+        });
+        
+        // Батырмалардың актив күйін ауыстыру
+        document.querySelectorAll('.filter-btn').forEach(btn => {
+            btn.classList.toggle('active', btn.dataset.filter === type);
+        });
+    }
+
+    // --- CHAT TOGGLE LOGIC ---
+    let chatOpen = false;
+    function toggleChat() {
+        chatOpen = !chatOpen;
+        const modal = document.getElementById('chat-modal');
+        const btn = document.getElementById('chat-toggle');
+        
+        modal.style.display = chatOpen ? 'flex' : 'none';
+        btn.textContent = chatOpen ? '✕' : '💬';
+    }
 
     // 1. Earthquake Prediction
     async function predict() {
@@ -326,82 +395,45 @@
             }], { ...baseLayout, margin: {t:20,b:40,l:120,r:20}, xaxis: { title: 'Risk Score', gridcolor: 'rgba(255,255,255,0.05)' } });
         });
 
-// Conflict Risk — GDELT Real Data
-fetch('https://crisis-radar-api.onrender.com/conflict/data')
-    .then(r => r.json())
-    .then(data => {
-        Plotly.newPlot('conflict-map', [{
-            type: 'scattergeo',
-            lat: data.latitude,
-            lon: data.longitude,
-            mode: 'markers',
-            marker: {
-                size: data.risk_score.map(s => s / 5),
-                color: data.risk_score,
-                colorscale: 'Reds',
-                showscale: true,
-                opacity: 0.8
-            },
-            text: data.country.map((c, i) => `${c}: ${data.conflict_events[i].toLocaleString()} events`)
-        }], { ...baseLayout, geo: geoBase, margin: {t:0,b:0,l:0,r:0} });
+    // Conflict Risk
+    fetch('https://crisis-radar-api.onrender.com/conflict/data')
+        .then(r => r.json())
+        .then(data => {
+            Plotly.newPlot('conflict-map', [{
+                type: 'scattergeo', lat: data.latitude, lon: data.longitude, mode: 'markers',
+                marker: { size: data.risk_score.map(s => s / 5), color: data.risk_score, colorscale: 'Reds', showscale: true, opacity: 0.8 },
+                text: data.country.map((c, i) => `${c}: ${data.conflict_events[i].toLocaleString()} events`)
+            }], { ...baseLayout, geo: geoBase, margin: {t:0,b:0,l:0,r:0} });
 
-        Plotly.newPlot('conflict-chart', [{
-            type: 'bar',
-            x: data.conflict_events,
-            y: data.country,
-            orientation: 'h',
-            marker: { color: data.conflict_events, colorscale: 'Reds' },
-            text: data.conflict_events.map(v => v.toLocaleString()),
-            textposition: 'outside'
-        }], { ...baseLayout,
-              margin: {t:20,b:40,l:120,r:80},
-              xaxis: { title: 'Conflict Events' } });
-    })
-    .catch(() => {
-        document.getElementById('conflict-map').innerHTML =
-            '<p style="color:gray;padding:20px;">⚠️ Деректер қолжетімсіз</p>';
-    });
+            Plotly.newPlot('conflict-chart', [{
+                type: 'bar', x: data.conflict_events, y: data.country, orientation: 'h',
+                marker: { color: data.conflict_events, colorscale: 'Reds' },
+                text: data.conflict_events.map(v => v.toLocaleString()), textposition: 'outside'
+            }], { ...baseLayout, margin: {t:20,b:40,l:120,r:80}, xaxis: { title: 'Conflict Events' } });
+        })
+        .catch(() => {
+            document.getElementById('conflict-map').innerHTML = '<p style="color:gray;padding:20px;">⚠️ Деректер қолжетімсіз</p>';
+        });
 
-// EM-DAT — Real Data
-const emdat = {
-    disaster_type: ['Earthquake','Flood','Storm','Drought','Wildfire','Landslide','Volcanic','Extreme Temp'],
-    total_deaths: [747234, 158432, 234567, 89432, 12453, 23456, 4532, 67234],
-    events: [450, 890, 780, 150, 200, 340, 30, 180],
-    economic_loss: [320, 180, 250, 95, 78, 45, 12, 67]
-};
+    // EM-DAT — Real Data
+    const emdat = {
+        disaster_type: ['Earthquake','Flood','Storm','Drought','Wildfire','Landslide','Volcanic','Extreme Temp'],
+        total_deaths: [747234, 158432, 234567, 89432, 12453, 23456, 4532, 67234],
+        events: [450, 890, 780, 150, 200, 340, 30, 180],
+        economic_loss: [320, 180, 250, 95, 78, 45, 12, 67]
+    };
 
-Plotly.newPlot('emdat-chart', [{
-    type: 'bar',
-    x: emdat.total_deaths,
-    y: emdat.disaster_type,
-    orientation: 'h',
-    marker: { color: emdat.total_deaths, colorscale: 'Reds', showscale: true },
-    text: emdat.total_deaths.map(d => d.toLocaleString()),
-    textposition: 'outside'
-}], {
-    ...baseLayout,
-    margin: {t:20,b:40,l:120,r:80},
-    xaxis: { title: 'Total Deaths (2000-2023)', gridcolor: 'rgba(255,255,255,0.05)' }
-});
+    Plotly.newPlot('emdat-chart', [{
+        type: 'bar', x: emdat.total_deaths, y: emdat.disaster_type, orientation: 'h',
+        marker: { color: emdat.total_deaths, colorscale: 'Reds', showscale: true },
+        text: emdat.total_deaths.map(d => d.toLocaleString()), textposition: 'outside'
+    }], { ...baseLayout, margin: {t:20,b:40,l:120,r:80}, xaxis: { title: 'Total Deaths (2000-2023)', gridcolor: 'rgba(255,255,255,0.05)' } });
 
-Plotly.newPlot('emdat-bubble', [{
-    type: 'scatter',
-    x: emdat.events,
-    y: emdat.total_deaths,
-    mode: 'markers',
-    marker: {
-        size: emdat.economic_loss.map(d => Math.sqrt(d) * 4),
-        color: emdat.economic_loss,
-        colorscale: 'Reds',
-        showscale: true,
-        colorbar: { title: 'Economic Loss ($B)' }
-    },
-    text: emdat.disaster_type
-}], {
-    ...baseLayout,
-    xaxis: { title: 'Number of Events', gridcolor: 'rgba(255,255,255,0.05)' },
-    yaxis: { title: 'Total Deaths', gridcolor: 'rgba(255,255,255,0.05)' }
-});
+    Plotly.newPlot('emdat-bubble', [{
+        type: 'scatter', x: emdat.events, y: emdat.total_deaths, mode: 'markers',
+        marker: { size: emdat.economic_loss.map(d => Math.sqrt(d) * 4), color: emdat.economic_loss, colorscale: 'Reds', showscale: true, colorbar: { title: 'Economic Loss ($B)' } },
+        text: emdat.disaster_type
+    }], { ...baseLayout, xaxis: { title: 'Number of Events', gridcolor: 'rgba(255,255,255,0.05)' }, yaxis: { title: 'Total Deaths', gridcolor: 'rgba(255,255,255,0.05)' } });
 
     // 6. Final Risk
     fetch('https://crisis-radar-api.onrender.com/risk/composite')
@@ -418,10 +450,7 @@ Plotly.newPlot('emdat-bubble', [{
             Plotly.newPlot('final-radar', [{
                 type: 'scatterpolar', r: vals, theta: cats, fill: 'toself',
                 line: { color: RED }, fillcolor: 'rgba(255,0,0,0.15)'
-            }], {
-                polar: { bgcolor: PLOT_BG, radialaxis: { visible: true, range:[0,100], color: FONT_COLOR }, angularaxis: { color: FONT_COLOR } },
-                paper_bgcolor: PLOT_BG, font: { color: FONT_COLOR, family: 'JetBrains Mono' }
-            });
+            }], { polar: { bgcolor: PLOT_BG, radialaxis: { visible: true, range:[0,100], color: FONT_COLOR }, angularaxis: { color: FONT_COLOR } }, paper_bgcolor: PLOT_BG, font: { color: FONT_COLOR, family: 'JetBrains Mono' } });
         });
 
     // 7. Live News
@@ -433,10 +462,7 @@ Plotly.newPlot('emdat-bubble', [{
                 const card = document.createElement('div');
                 card.className = 'news-card';
                 card.onclick = () => window.open(a.url, '_blank');
-                card.innerHTML = `
-                    <div class="news-source">${a.source} • ${new Date(a.published).toLocaleDateString()}</div>
-                    <div class="news-title">${a.title}</div>
-                `;
+                card.innerHTML = `<div class="news-source">${a.source} • ${new Date(a.published).toLocaleDateString()}</div><div class="news-title">${a.title}</div>`;
                 container.appendChild(card);
             });
         });

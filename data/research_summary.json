@@ -1,0 +1,62 @@
+{
+    "Ukraine": {
+        "EVENTS": 308984,
+        "FATALITIES": 251731
+    },
+    "Afghanistan": {
+        "EVENTS": 69314,
+        "FATALITIES": 203885
+    },
+    "Yemen": {
+        "EVENTS": 113020,
+        "FATALITIES": 167033
+    },
+    "Syria": {
+        "EVENTS": 149615,
+        "FATALITIES": 143067
+    },
+    "Iraq": {
+        "EVENTS": 67708,
+        "FATALITIES": 107680
+    },
+    "Myanmar": {
+        "EVENTS": 104993,
+        "FATALITIES": 106925
+    },
+    "Palestine": {
+        "EVENTS": 92770,
+        "FATALITIES": 72269
+    },
+    "Pakistan": {
+        "EVENTS": 113657,
+        "FATALITIES": 55987
+    },
+    "Iran": {
+        "EVENTS": 38011,
+        "FATALITIES": 33388
+    },
+    "Philippines": {
+        "EVENTS": 18842,
+        "FATALITIES": 18514
+    },
+    "India": {
+        "EVENTS": 206792,
+        "FATALITIES": 13703
+    },
+    "Turkey": {
+        "EVENTS": 49377,
+        "FATALITIES": 9710
+    },
+    "Bangladesh": {
+        "EVENTS": 34580,
+        "FATALITIES": 8319
+    },
+    "Azerbaijan": {
+        "EVENTS": 19024,
+        "FATALITIES": 7797
+    },
+    "Russia": {
+        "EVENTS": 55603,
+        "FATALITIES": 7460
+    }
+}
