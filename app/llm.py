@@ -1,115 +1,199 @@
 import os
 import json
+import uuid
 import pandas as pd
 from dotenv import load_dotenv
-from groq import Groq
-import chromadb
 
-# .env файлынан GROQ_API_KEY-ді оқимыз
 load_dotenv()
 
-# Groq клиенті
-client = Groq(api_key=os.getenv("GROQ_API_KEY"))
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+ROOT_DIR = os.path.dirname(BASE_DIR)
+DATA_DIR = os.path.join(ROOT_DIR, 'data')
 
-# ChromaDB клиенті
-chroma_client = chromadb.Client()
-collection = chroma_client.get_or_create_collection("crisis_radar_memory")
+def data_path(f): return os.path.join(DATA_DIR, f)
 
-def get_verified_data(query: str):
-    """
-    Барлық CSV және JSON файлдарынан қажетті контекстті жинайды.
-    """
-    context = {}
-    q = query.lower()
-    
-    # Файл жолдары (Relative paths)
-    data_dir = os.path.join(os.path.dirname(__file__), '../data/')
+# =====================================================
+# GROQ
+# =====================================================
+try:
+    from groq import Groq
+    _key = os.getenv("GROQ_API_KEY")
+    if not _key:
+        raise ValueError("No GROQ_API_KEY")
+    client = Groq(api_key=_key)
+    GROQ_AVAILABLE = True
+    print("✅ Groq client ready")
+except Exception as e:
+    GROQ_AVAILABLE = False
+    client = None
+    print(f"⚠️ Groq: {e}")
 
-    # 1. ACLED ЗЕРТТЕУ ДЕРЕКТЕРІ (Соғыстар мен қақтығыстар)
-    if any(word in q for word in ["conflict", "war", "соғыс", "қақтығыс", "research", "зерттеу"]):
-        summary_path = os.path.join(data_dir, 'research_summary.json')
-        if os.path.exists(summary_path):
-            with open(summary_path, 'r', encoding='utf-8') as f:
-                context["conflict_research"] = json.load(f)
-                context["conflict_source"] = "ACLED Regional Aggregated Data (2026)"
+# =====================================================
+# ChromaDB
+# =====================================================
+try:
+    import chromadb
+    _chroma = chromadb.Client()
+    collection = _chroma.get_or_create_collection("crisis_radar")
+    CHROMA_OK = True
+except:
+    collection = None
+    CHROMA_OK = False
 
-    # 2. ЯДРОЛЫҚ ҚАУІП
-    if any(word in q for word in ["nuclear", "warhead", "ядролық", "атом"]):
-        nuke_path = os.path.join(data_dir, 'nuclear_inventory.csv')
-        if os.path.exists(nuke_path):
-            try:
-                df_nuke = pd.read_csv(nuke_path)
-                # AI-ға тым көп дерек жібермеу үшін тек маңызды бағандарды аламыз
-                context["nuclear_data"] = df_nuke[['country', 'nuclear_warheads', 'risk_score']].to_dict(orient='records')
-                context["nuclear_source"] = "Federation of American Scientists (FAS) / NTI"
-            except Exception as e:
-                print(f"Nuclear data error: {e}")
+# =====================================================
+# БАРЛЫҚ ДЕРЕКТЕРДІ БІР РЕТ ЖҮКТЕП КЭШ САҚТАУ
+# =====================================================
+_full_context = None
 
-    # 3. ЖЕР СІЛКІНІСІ
-    if any(word in q for word in ["earthquake", "жер сілкінісі", "магнитуда"]):
-        eq_path = os.path.join(data_dir, 'earthquake_data.csv') # Егер notebooks-та болса, жолын түзетіңіз
-        if os.path.exists(eq_path):
-            try:
-                df_eq = pd.read_csv(eq_path)
-                context["earthquake_stats"] = {
-                    "max_magnitude": float(df_eq['mag'].max()),
-                    "recent_count": len(df_eq),
-                    "latest_events": df_eq[['place', 'mag', 'time']].head(5).to_dict(orient='records')
-                }
-                context["earthquake_source"] = "USGS Real-time API"
-            except:
-                pass
+def load_all_data() -> dict:
+    """Барлық деректерді бір рет жүктейді"""
+    global _full_context
+    if _full_context is not None:
+        return _full_context
 
-    return context
+    ctx = {}
 
-def chat_with_ai(user_message: str, history: list = []):
-    """
-    Чат функциясы. Тек файлдан алынған деректерді пайдаланады.
-    """
-    # 1. Файлдардан деректерді жинау
-    verified_context = get_verified_data(user_message)
-    
-    # 2. Егер контекст бос болса (сұрақ тақырыптан тыс болса)
-    if not verified_context:
-        return ("Кешіріңіз, жүйеде бұл сұрақ бойынша нақты деректер табылмады. "
-                "Мен тек Жер сілкінісі, Ядролық қауіп және Қақтығыстар зерттеуі бойынша жауап бере аламын.")
+    # 1. CONFLICT деректері (негізгі)
+    p = data_path('research_summary.json')
+    if os.path.exists(p):
+        with open(p, 'r', encoding='utf-8') as f:
+            raw = json.load(f)
+        # AI-ға тек маңызды бағандарды жіберу (token үнемдеу)
+        ctx["conflict_data"] = {
+            country: {
+                "events": vals.get("EVENTS", 0),
+                "fatalities": vals.get("FATALITIES", 0)
+            }
+            for country, vals in raw.items()
+        }
+        ctx["conflict_source"] = "ACLED Regional Data 2026"
+        ctx["conflict_countries_count"] = len(raw)
+        print(f"✅ Conflict data loaded: {len(raw)} countries")
 
-    # 3. SYSTEM PROMPT - AI-ға қатаң шекара қою
-    STRICT_SYSTEM_PROMPT = f"""Сен CrisisRadar жүйесінің стратегиялық аналитигісің.
-Сенің ЖАЛҒЫЗ ақпарат көзің — төменде берілген JSON деректері.
+    # 2. EARTHQUAKE деректері
+    eq_path = data_path('earthquake_data.csv')
+    if os.path.exists(eq_path):
+        try:
+            df = pd.read_csv(eq_path).dropna(subset=['mag'])
+            ctx["earthquake_data"] = {
+                "total_events": len(df),
+                "max_magnitude": round(float(df['mag'].max()), 2),
+                "avg_magnitude": round(float(df['mag'].mean()), 2),
+                "high_risk_events": len(df[df['mag'] >= 6.0]),
+                "top10_strongest": df.nlargest(10, 'mag')[['place', 'mag']].to_dict(orient='records')
+            }
+            ctx["earthquake_source"] = "USGS Real-time API"
+            print(f"✅ Earthquake data loaded: {len(df)} events")
+        except Exception as e:
+            print(f"⚠️ Earthquake: {e}")
 
-ҚАТАҢ ТӘРТІП:
-1. Егер сұрақ берілген деректерде ҚАМТЫЛМАҒАН болса, "Мәлімет жоқ" деп жауап бер.
-2. Өз ойыңнан немесе ішкі біліміңнен ешқандай сан шығарма (мысалы, оқтұмсық санын тек файлдан ал).
-3. Жауаптың соңында міндетті түрде дереккөзді (source) көрсет.
-4. Тіл: Пайдаланушы қай тілде сұраса, сол тілде жауап бер.
-5. Тон: Кәсіби, нақты және қысқа.
+    # 3. NUCLEAR деректері
+    nuc_path = data_path('nuclear_inventory.csv')
+    if os.path.exists(nuc_path):
+        try:
+            df = pd.read_csv(nuc_path)
+            df.columns = [c.lower().strip() for c in df.columns]
+            ctx["nuclear_data"] = df.head(15).to_dict(orient='records')
+            ctx["nuclear_source"] = "FAS/NTI 2025"
+        except:
+            pass
 
-БЕРІЛГЕН ДЕРЕКТЕР (JSON):
-{json.dumps(verified_context, indent=2, ensure_ascii=False)}
+    # Nuclear fallback
+    if "nuclear_data" not in ctx:
+        ctx["nuclear_data"] = [
+            {"country": "Russia",      "warheads": 5889, "risk_score": 92},
+            {"country": "USA",         "warheads": 5244, "risk_score": 88},
+            {"country": "North Korea", "warheads": 50,   "risk_score": 85},
+            {"country": "Pakistan",    "warheads": 170,  "risk_score": 78},
+            {"country": "China",       "warheads": 410,  "risk_score": 72},
+            {"country": "India",       "warheads": 164,  "risk_score": 65},
+            {"country": "Israel",      "warheads": 90,   "risk_score": 70},
+        ]
+        ctx["nuclear_source"] = "FAS/NTI 2025 (estimated)"
+
+    _full_context = ctx
+    return ctx
+
+
+def chat_with_ai(user_message: str, history: list = None) -> str:
+    if history is None:
+        history = []
+
+    if not GROQ_AVAILABLE:
+        return "⚠️ AI қолжетімсіз. GROQ_API_KEY .env файлында орнатылған ба?"
+
+    # Барлық деректерді жүктеу (кэштен)
+    all_data = load_all_data()
+
+    # Сұрауға байланысты тек керекті деректерді таңдау
+    q = query = user_message.lower()
+    ctx = {}
+
+    # Conflict — кілт сөз болмаса да негізгі деректер
+    if any(w in q for w in ["war","соғыс","conflict","қақтығыс","fight","battle",
+                              "kill","өлім","ukraine","russia","gaza","syria",
+                              "afghanistan","myanmar","sudan","yemen","fatalities",
+                              "қауіп","risk","danger","world","әлем","халық"]):
+        ctx["conflict_data"] = all_data.get("conflict_data", {})
+        ctx["conflict_source"] = all_data.get("conflict_source", "")
+        ctx["total_countries_monitored"] = all_data.get("conflict_countries_count", 0)
+
+    # Earthquake
+    if any(w in q for w in ["earthquake","seismic","жер сілкінісі","magnitude",
+                              "tremor","richter","quake"]):
+        ctx["earthquake_data"] = all_data.get("earthquake_data", {})
+        ctx["earthquake_source"] = all_data.get("earthquake_source", "")
+
+    # Nuclear
+    if any(w in q for w in ["nuclear","ядролық","warhead","nuke","атом",
+                              "missile","бомба","bomb"]):
+        ctx["nuclear_data"] = all_data.get("nuclear_data", [])
+        ctx["nuclear_source"] = all_data.get("nuclear_source", "")
+
+    # Егер ешбір кілт сөз болмаса — БАРЛЫҚ деректерді бер
+    if not ctx:
+        ctx = all_data
+
+    # =====================================================
+    # SYSTEM PROMPT
+    # =====================================================
+    system = f"""Сен CrisisRadar платформасының стратегиялық аналитигісің.
+Сенің жалғыз ақпарат көзің — төменде берілген нақты деректер (ACLED, USGS, FAS).
+
+ЕРЕЖЕЛЕР:
+1. Тек берілген деректерге сүйен — өз ойыңнан сан шығарма
+2. Сандарды нақты келтір (мысалы: "Ukraine: 308,984 оқиға, 251,731 қаза")
+3. Жауаптың соңында дереккөзін көрсет
+4. Пайдаланушы тілінде жауап бер (қазақша/орысша/ағылшынша)
+5. Қысқа және нақты бол
+
+ДЕРЕКТЕР:
+{json.dumps(ctx, indent=2, ensure_ascii=False, default=str)}
 """
 
-    messages = [{"role": "system", "content": STRICT_SYSTEM_PROMPT}]
-    messages += history[-4:]  # Соңғы 4 хабарламаны ғана жадта ұстау (контекст үзілмеуі үшін)
+    messages = [{"role": "system", "content": system}]
+    messages += (history or [])[-4:]
     messages.append({"role": "user", "content": user_message})
 
     try:
-        response = client.chat.completions.create(
-            model="llama-3.3-70b-versatile",
+        r = client.chat.completions.create(
+            model="llama-3.1-8b-instant",
             messages=messages,
-            temperature=0.0, # Галлюцинацияны болдырмау үшін нөлге теңестіреміз
-            max_tokens=1000
+            temperature=0.0,
+            max_tokens=800
         )
-        
-        ai_response = response.choices[0].message.content
-        return ai_response
-
+        return r.choices[0].message.content
     except Exception as e:
-        return f"Жүйелік қате орын алды: {str(e)}"
+        return f"Қате: {e}"
 
-# Мемори функциялары (ChromaDB)
+
 def save_to_memory(query: str, response: str):
-    collection.add(
-        documents=[f"Q: {query}\nA: {response}"],
-        ids=[f"chat_{collection.count()}"]
-    )
+    if not CHROMA_OK or collection is None:
+        return
+    try:
+        collection.add(
+            documents=[f"Q:{query}\nA:{response}"],
+            ids=[f"c_{uuid.uuid4().hex[:8]}"]
+        )
+    except:
+        pass

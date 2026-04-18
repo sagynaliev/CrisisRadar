@@ -334,7 +334,7 @@
         const btn = document.querySelector('.btn-action');
         btn.innerText = 'PROCESSING...';
         try {
-            const r = await fetch('https://crisis-radar-api.onrender.com/predict/earthquake', {
+            const r = await fetch('http://127.0.0.1:8000/predict/earthquake', {
                 method: 'POST', headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                     latitude: parseFloat(document.getElementById('lat').value),
@@ -353,17 +353,19 @@
     }
 
     // 2. Seismic Map + Chart
-    fetch('https://crisis-radar-api.onrender.com/earthquake/data')
-        .then(r => r.json())
+    fetch('http://127.0.0.1:8000/earthquake/data')
+        .then(r => { if(!r.ok) throw new Error(r.status); return r.json(); })
         .then(data => {
+            if (!data.lats || !data.lats.length) throw new Error('empty');
+            const lats = data.lats, lons = data.lons, mags = data.mags, places = data.places || [];
             Plotly.newPlot('main-map', [{
-                type: 'scattergeo', lat: data.lats, lon: data.lons, mode: 'markers',
-                marker: { size: data.mags.map(m => m * 2), color: data.mags, colorscale: 'Reds', showscale: true, opacity: 0.8 },
-                text: data.places
+                type: 'scattergeo', lat: lats, lon: lons, mode: 'markers',
+                marker: { size: mags.map(m => m * 2), color: mags, colorscale: 'Reds', showscale: true, opacity: 0.8 },
+                text: places
             }], { ...baseLayout, geo: geoBase, margin: { t: 0, b: 0, l: 0, r: 0 } });
 
             Plotly.newPlot('seismic-chart', [{
-                x: data.mags, type: 'histogram', marker: { color: RED }, nbinsx: 20
+                x: mags, type: 'histogram', marker: { color: RED }, nbinsx: 20
             }], { ...baseLayout, xaxis: { title: 'Magnitude', gridcolor: 'rgba(255,255,255,0.05)' }, yaxis: { title: 'Count', gridcolor: 'rgba(255,255,255,0.05)' } });
         })
         .catch(() => {
@@ -379,40 +381,78 @@
             }], { ...baseLayout });
         });
 
-    // 3. Nuclear Risk
-    fetch('https://crisis-radar-api.onrender.com/nuclear/data')
-        .then(r => r.json())
-        .then(data => {
+    // 3. Nuclear Risk — API /nuclear/data жауабы to-dict(orient='list') форматы
+    fetch('http://127.0.0.1:8000/nuclear/data')
+        .then(r => { if(!r.ok) throw new Error(r.status); return r.json(); })
+        .then(raw => {
+            // API {country:[..], latitude:[..], composite_score:[..]} форматында қайтарады
+            const data = raw;
+            const scores = data.composite_score || data.warheads || [];
+            const countries = data.country || [];
+            const lats = data.latitude || [];
+            const lons = data.longitude || [];
+
             Plotly.newPlot('nuclear-map', [{
-                type: 'scattergeo', lat: data.latitude, lon: data.longitude, mode: 'markers',
-                marker: { size: data.composite_score.map(s => s/5), color: data.composite_score, colorscale: 'Reds', showscale: true },
-                text: data.country.map((c,i) => `${c}: ${data.composite_score[i].toFixed(1)}`)
+                type: 'scattergeo', lat: lats, lon: lons, mode: 'markers',
+                marker: { size: scores.map(s => Math.max(5, s/4)), color: scores, colorscale: 'Reds', showscale: true },
+                text: countries.map((c,i) => `${c}: ${scores[i]}`)
             }], { ...baseLayout, geo: geoBase, margin: {t:0,b:0,l:0,r:0} });
 
             Plotly.newPlot('nuclear-chart', [{
-                type: 'bar', x: data.composite_score, y: data.country, orientation: 'h',
-                marker: { color: data.composite_score, colorscale: 'Reds' }
+                type: 'bar', x: scores, y: countries, orientation: 'h',
+                marker: { color: scores, colorscale: 'Reds' },
+                text: scores, textposition: 'outside'
             }], { ...baseLayout, margin: {t:20,b:40,l:120,r:20}, xaxis: { title: 'Risk Score', gridcolor: 'rgba(255,255,255,0.05)' } });
-        });
+        })
+        .catch(e => console.warn('Nuclear data error:', e));
 
     // Conflict Risk
-    fetch('https://crisis-radar-api.onrender.com/conflict/data')
-        .then(r => r.json())
+    fetch('http://127.0.0.1:8000/conflict/data')
+        .then(r => { if(!r.ok) throw new Error(r.status); return r.json(); })
         .then(data => {
+            if (!data.country || !data.country.length) throw new Error('empty');
+
+            // risk_score бойынша TOP 10 сұрыптау
+            const indices = data.risk_score
+                .map((s, i) => ({ s, i }))
+                .sort((a, b) => b.s - a.s)
+                .slice(0, 10)
+                .map(x => x.i);
+
+            const top = {
+                country:         indices.map(i => data.country[i]),
+                fatalities:      indices.map(i => data.fatalities[i]),
+                conflict_events: indices.map(i => data.conflict_events[i]),
+                latitude:        indices.map(i => data.latitude[i]),
+                longitude:       indices.map(i => data.longitude[i]),
+                risk_score:      indices.map(i => data.risk_score[i]),
+            };
+
             Plotly.newPlot('conflict-map', [{
-                type: 'scattergeo', lat: data.latitude, lon: data.longitude, mode: 'markers',
-                marker: { size: data.risk_score.map(s => s / 5), color: data.risk_score, colorscale: 'Reds', showscale: true, opacity: 0.8 },
-                text: data.country.map((c, i) => `${c}: ${data.conflict_events[i].toLocaleString()} events`)
+                type: 'scattergeo', lat: top.latitude, lon: top.longitude, mode: 'markers',
+                marker: { size: top.risk_score.map(s => Math.max(6, s / 2.5)), color: top.risk_score, colorscale: 'Reds', showscale: true, opacity: 0.9 },
+                text: top.country.map((c, i) => `${c}<br>Events: ${top.conflict_events[i].toLocaleString()}<br>Fatalities: ${top.fatalities[i].toLocaleString()}`)
             }], { ...baseLayout, geo: geoBase, margin: {t:0,b:0,l:0,r:0} });
 
             Plotly.newPlot('conflict-chart', [{
-                type: 'bar', x: data.conflict_events, y: data.country, orientation: 'h',
-                marker: { color: data.conflict_events, colorscale: 'Reds' },
-                text: data.conflict_events.map(v => v.toLocaleString()), textposition: 'outside'
-            }], { ...baseLayout, margin: {t:20,b:40,l:120,r:80}, xaxis: { title: 'Conflict Events' } });
+                type: 'bar', x: top.fatalities, y: top.country, orientation: 'h',
+                marker: { color: top.fatalities, colorscale: 'Reds' },
+                text: top.fatalities.map(v => v.toLocaleString()), textposition: 'outside'
+            }], { ...baseLayout, margin: {t:20,b:40,l:120,r:80}, xaxis: { title: 'Total Fatalities (ACLED 2026)' } });
         })
         .catch(() => {
-            document.getElementById('conflict-map').innerHTML = '<p style="color:gray;padding:20px;">⚠️ Деректер қолжетімсіз</p>';
+            // ACLED деректері жоқ болса — research_summary.json fallback
+            const fallback = {"country":["Ukraine","Afghanistan","Yemen","Syria","Iraq","Myanmar","Palestine","Pakistan"],"conflict_events":[308984,69314,113020,149615,67708,104993,92770,113657],"fatalities":[251731,203885,167033,143067,107680,106925,72269,55987],"latitude":[49,33.9,15.5,35,33.2,19.2,31.9,30.4],"longitude":[32,67.7,48.5,38,43.7,96.9,35.2,69.3],"risk_score":[100,22.4,36.6,48.4,21.9,34,30,36.8]};
+            Plotly.newPlot('conflict-map', [{
+                type: 'scattergeo', lat: fallback.latitude, lon: fallback.longitude, mode: 'markers',
+                marker: { size: fallback.risk_score.map(s => Math.max(4, s/3)), color: fallback.risk_score, colorscale: 'Reds', showscale: true, opacity: 0.85 },
+                text: fallback.country.map((c,i) => `${c}<br>Fatalities: ${fallback.fatalities[i].toLocaleString()}`)
+            }], { ...baseLayout, geo: geoBase, margin: {t:0,b:0,l:0,r:0} });
+            Plotly.newPlot('conflict-chart', [{
+                type: 'bar', x: fallback.fatalities, y: fallback.country, orientation: 'h',
+                marker: { color: fallback.fatalities, colorscale: 'Reds' },
+                text: fallback.fatalities.map(v => v.toLocaleString()), textposition: 'outside'
+            }], { ...baseLayout, margin: {t:20,b:40,l:120,r:80}, xaxis: { title: 'Total Fatalities (ACLED 2026)' } });
         });
 
     // EM-DAT — Real Data
@@ -436,8 +476,8 @@
     }], { ...baseLayout, xaxis: { title: 'Number of Events', gridcolor: 'rgba(255,255,255,0.05)' }, yaxis: { title: 'Total Deaths', gridcolor: 'rgba(255,255,255,0.05)' } });
 
     // 6. Final Risk
-    fetch('https://crisis-radar-api.onrender.com/risk/composite')
-        .then(r => r.json())
+    fetch('http://127.0.0.1:8000/risk/composite')
+        .then(r => { if(!r.ok) throw new Error(r.status); return r.json(); })
         .then(data => {
             Plotly.newPlot('final-bar', [{
                 type: 'bar', x: data.composite, y: data.risk_category, orientation: 'h',
@@ -454,17 +494,20 @@
         });
 
     // 7. Live News
-    fetch('https://crisis-radar-api.onrender.com/news/risk')
-        .then(r => r.json())
+    fetch('http://127.0.0.1:8000/news/risk')
+        .then(r => { if(!r.ok) throw new Error(r.status); return r.json(); })
         .then(data => {
             const container = document.getElementById('news-container');
-            data.articles.forEach(a => {
+            (data.articles || []).forEach(a => {
                 const card = document.createElement('div');
                 card.className = 'news-card';
-                card.onclick = () => window.open(a.url, '_blank');
+                card.onclick = () => a.url !== '#' && window.open(a.url, '_blank');
                 card.innerHTML = `<div class="news-source">${a.source} • ${new Date(a.published).toLocaleDateString()}</div><div class="news-title">${a.title}</div>`;
                 container.appendChild(card);
             });
+        })
+        .catch(() => {
+            document.getElementById('news-container').innerHTML = '<p style="color:var(--text-muted);padding:20px;font-family:var(--font-mono);font-size:0.8rem;">⚠️ News feed temporarily unavailable</p>';
         });
 
     // 8. AI Chat
@@ -477,7 +520,7 @@
         input.value = '';
         document.getElementById('spinner').style.display = 'block';
         try {
-            const r = await fetch('https://crisis-radar-api.onrender.com/chat', {
+            const r = await fetch('http://127.0.0.1:8000/chat', {
                 method: 'POST', headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ message: text, history: chatHistory })
             });

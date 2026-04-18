@@ -1,62 +1,758 @@
 {
-    "Ukraine": {
-        "EVENTS": 308984,
-        "FATALITIES": 251731
-    },
-    "Afghanistan": {
-        "EVENTS": 69314,
-        "FATALITIES": 203885
-    },
-    "Yemen": {
-        "EVENTS": 113020,
-        "FATALITIES": 167033
-    },
-    "Syria": {
-        "EVENTS": 149615,
-        "FATALITIES": 143067
-    },
-    "Iraq": {
-        "EVENTS": 67708,
-        "FATALITIES": 107680
-    },
-    "Myanmar": {
-        "EVENTS": 104993,
-        "FATALITIES": 106925
-    },
-    "Palestine": {
-        "EVENTS": 92770,
-        "FATALITIES": 72269
-    },
-    "Pakistan": {
-        "EVENTS": 113657,
-        "FATALITIES": 55987
-    },
-    "Iran": {
-        "EVENTS": 38011,
-        "FATALITIES": 33388
-    },
-    "Philippines": {
-        "EVENTS": 18842,
-        "FATALITIES": 18514
-    },
-    "India": {
-        "EVENTS": 206792,
-        "FATALITIES": 13703
-    },
-    "Turkey": {
-        "EVENTS": 49377,
-        "FATALITIES": 9710
-    },
-    "Bangladesh": {
-        "EVENTS": 34580,
-        "FATALITIES": 8319
-    },
-    "Azerbaijan": {
-        "EVENTS": 19024,
-        "FATALITIES": 7797
-    },
-    "Russia": {
-        "EVENTS": 55603,
-        "FATALITIES": 7460
-    }
+  "Ukraine": {
+    "EVENTS": 308984,
+    "FATALITIES": 251731,
+    "LAT": 44.4978,
+    "LON": 33.4874
+  },
+  "Afghanistan": {
+    "EVENTS": 69314,
+    "FATALITIES": 203885,
+    "LAT": 36.966,
+    "LON": 73.3417
+  },
+  "Yemen": {
+    "EVENTS": 113020,
+    "FATALITIES": 167033,
+    "LAT": 13.6274,
+    "LON": 46.228
+  },
+  "Syria": {
+    "EVENTS": 149615,
+    "FATALITIES": 143067,
+    "LAT": 36.4131,
+    "LON": 40.5519
+  },
+  "Iraq": {
+    "EVENTS": 67708,
+    "FATALITIES": 107680,
+    "LAT": 33.1774,
+    "LON": 41.3987
+  },
+  "Myanmar": {
+    "EVENTS": 104993,
+    "FATALITIES": 106925,
+    "LAT": 17.1075,
+    "LON": 95.1442
+  },
+  "Palestine": {
+    "EVENTS": 92770,
+    "FATALITIES": 72269,
+    "LAT": 31.407,
+    "LON": 34.3577
+  },
+  "Pakistan": {
+    "EVENTS": 113657,
+    "FATALITIES": 55987,
+    "LAT": 33.9425,
+    "LON": 73.891
+  },
+  "Iran": {
+    "EVENTS": 38011,
+    "FATALITIES": 33388,
+    "LAT": 35.9457,
+    "LON": 50.906
+  },
+  "Philippines": {
+    "EVENTS": 18842,
+    "FATALITIES": 18514,
+    "LAT": 5.9742,
+    "LON": 121.1565
+  },
+  "India": {
+    "EVENTS": 206792,
+    "FATALITIES": 13703,
+    "LAT": 12.6031,
+    "LON": 92.8252
+  },
+  "Turkey": {
+    "EVENTS": 49377,
+    "FATALITIES": 9710,
+    "LAT": 37.4745,
+    "LON": 35.3726
+  },
+  "Bangladesh": {
+    "EVENTS": 34580,
+    "FATALITIES": 8319,
+    "LAT": 22.4294,
+    "LON": 90.2361
+  },
+  "Azerbaijan": {
+    "EVENTS": 19024,
+    "FATALITIES": 7797,
+    "LAT": 40.3229,
+    "LON": 49.2148
+  },
+  "Russia": {
+    "EVENTS": 55603,
+    "FATALITIES": 7460,
+    "LAT": 52.5418,
+    "LON": 82.7009
+  },
+  "Saudi Arabia": {
+    "EVENTS": 3666,
+    "FATALITIES": 6502,
+    "LAT": 30.1511,
+    "LON": 39.7423
+  },
+  "Lebanon": {
+    "EVENTS": 37694,
+    "FATALITIES": 6491,
+    "LAT": 34.5499,
+    "LON": 36.1901
+  },
+  "Thailand": {
+    "EVENTS": 13417,
+    "FATALITIES": 3457,
+    "LAT": 15.9157,
+    "LON": 104.7311
+  },
+  "Israel": {
+    "EVENTS": 19998,
+    "FATALITIES": 2047,
+    "LAT": 33.8438,
+    "LON": 28.4103
+  },
+  "Indonesia": {
+    "EVENTS": 25621,
+    "FATALITIES": 1812,
+    "LAT": 3.9083,
+    "LON": 97.125
+  },
+  "Papua New Guinea": {
+    "EVENTS": 1487,
+    "FATALITIES": 1385,
+    "LAT": -6.1409,
+    "LON": 155.2056
+  },
+  "Sri Lanka": {
+    "EVENTS": 9228,
+    "FATALITIES": 637,
+    "LAT": 7.3824,
+    "LON": 80.7237
+  },
+  "Greece": {
+    "EVENTS": 7994,
+    "FATALITIES": 470,
+    "LAT": 37.7203,
+    "LON": 26.8212
+  },
+  "Nepal": {
+    "EVENTS": 25551,
+    "FATALITIES": 391,
+    "LAT": 27.6525,
+    "LON": 85.393
+  },
+  "Armenia": {
+    "EVENTS": 7384,
+    "FATALITIES": 307,
+    "LAT": 40.4795,
+    "LON": 44.2952
+  },
+  "Kazakhstan": {
+    "EVENTS": 5762,
+    "FATALITIES": 285,
+    "LAT": 44.7707,
+    "LON": 77.3136
+  },
+  "Tajikistan": {
+    "EVENTS": 185,
+    "FATALITIES": 259,
+    "LAT": 38.762,
+    "LON": 69.371
+  },
+  "Cambodia": {
+    "EVENTS": 2482,
+    "FATALITIES": 252,
+    "LAT": 13.7998,
+    "LON": 103.0782
+  },
+  "Jordan": {
+    "EVENTS": 4055,
+    "FATALITIES": 204,
+    "LAT": 32.2912,
+    "LON": 35.7319
+  },
+  "Vietnam": {
+    "EVENTS": 570,
+    "FATALITIES": 148,
+    "LAT": 10.5864,
+    "LON": 105.1733
+  },
+  "North Korea": {
+    "EVENTS": 611,
+    "FATALITIES": 140,
+    "LAT": 40.8996,
+    "LON": 126.7111
+  },
+  "Kyrgyzstan": {
+    "EVENTS": 2350,
+    "FATALITIES": 123,
+    "LAT": 39.8683,
+    "LON": 71.5736
+  },
+  "China": {
+    "EVENTS": 17958,
+    "FATALITIES": 108,
+    "LAT": 32.0219,
+    "LON": 117.1196
+  },
+  "France": {
+    "EVENTS": 45570,
+    "FATALITIES": 58,
+    "LAT": 45.866,
+    "LON": -3.699
+  },
+  "Malaysia": {
+    "EVENTS": 1694,
+    "FATALITIES": 57,
+    "LAT": 3.1414,
+    "LON": 101.681
+  },
+  "Germany": {
+    "EVENTS": 27424,
+    "FATALITIES": 56,
+    "LAT": 48.6264,
+    "LON": 9.0657
+  },
+  "Uzbekistan": {
+    "EVENTS": 1155,
+    "FATALITIES": 55,
+    "LAT": 40.7269,
+    "LON": 72.2977
+  },
+  "Laos": {
+    "EVENTS": 56,
+    "FATALITIES": 44,
+    "LAT": 20.3068,
+    "LON": 100.7297
+  },
+  "Turkmenistan": {
+    "EVENTS": 57,
+    "FATALITIES": 37,
+    "LAT": 37.9485,
+    "LON": 58.2447
+  },
+  "Serbia": {
+    "EVENTS": 7372,
+    "FATALITIES": 31,
+    "LAT": 44.6781,
+    "LON": 20.3803
+  },
+  "Bahrain": {
+    "EVENTS": 14223,
+    "FATALITIES": 27,
+    "LAT": 26.1927,
+    "LON": 50.5508
+  },
+  "Australia": {
+    "EVENTS": 4391,
+    "FATALITIES": 23,
+    "LAT": -35.5228,
+    "LON": 148.9564
+  },
+  "Belarus": {
+    "EVENTS": 4137,
+    "FATALITIES": 22,
+    "LAT": 52.4512,
+    "LON": 25.2526
+  },
+  "Cyprus": {
+    "EVENTS": 2552,
+    "FATALITIES": 21,
+    "LAT": 33.8438,
+    "LON": 28.4103
+  },
+  "Oman": {
+    "EVENTS": 91,
+    "FATALITIES": 21,
+    "LAT": 22.3885,
+    "LON": 57.2237
+  },
+  "New Caledonia": {
+    "EVENTS": 419,
+    "FATALITIES": 19,
+    "LAT": -20.9603,
+    "LON": 167.2022
+  },
+  "Croatia": {
+    "EVENTS": 1468,
+    "FATALITIES": 19,
+    "LAT": 45.7807,
+    "LON": 16.8969
+  },
+  "Bosnia and Herzegovina": {
+    "EVENTS": 1562,
+    "FATALITIES": 17,
+    "LAT": 44.8439,
+    "LON": 18.7944
+  },
+  "United Arab Emirates": {
+    "EVENTS": 187,
+    "FATALITIES": 16,
+    "LAT": 23.7727,
+    "LON": 53.7133
+  },
+  "Poland": {
+    "EVENTS": 8928,
+    "FATALITIES": 15,
+    "LAT": 54.677,
+    "LON": 19.256
+  },
+  "United Kingdom": {
+    "EVENTS": 9467,
+    "FATALITIES": 14,
+    "LAT": 52.8839,
+    "LON": -1.5767
+  },
+  "Qatar": {
+    "EVENTS": 122,
+    "FATALITIES": 13,
+    "LAT": 25.2934,
+    "LON": 51.5014
+  },
+  "Kuwait": {
+    "EVENTS": 248,
+    "FATALITIES": 13,
+    "LAT": 28.8688,
+    "LON": 47.9227
+  },
+  "Kosovo": {
+    "EVENTS": 1254,
+    "FATALITIES": 10,
+    "LAT": 42.2936,
+    "LON": 21.1198
+  },
+  "Georgia": {
+    "EVENTS": 5513,
+    "FATALITIES": 10,
+    "LAT": 42.9989,
+    "LON": 41.45
+  },
+  "Solomon Islands": {
+    "EVENTS": 52,
+    "FATALITIES": 9,
+    "LAT": -9.6268,
+    "LON": 160.1568
+  },
+  "Belgium": {
+    "EVENTS": 5216,
+    "FATALITIES": 9,
+    "LAT": 50.8388,
+    "LON": 4.3755
+  },
+  "Spain": {
+    "EVENTS": 24747,
+    "FATALITIES": 8,
+    "LAT": 36.0148,
+    "LON": -3.3309
+  },
+  "Austria": {
+    "EVENTS": 2295,
+    "FATALITIES": 8,
+    "LAT": 47.4749,
+    "LON": 16.4884
+  },
+  "Romania": {
+    "EVENTS": 3669,
+    "FATALITIES": 6,
+    "LAT": 46.0123,
+    "LON": 23.5454
+  },
+  "Italy": {
+    "EVENTS": 28978,
+    "FATALITIES": 4,
+    "LAT": 42.2897,
+    "LON": 13.8526
+  },
+  "Latvia": {
+    "EVENTS": 337,
+    "FATALITIES": 4,
+    "LAT": 56.6411,
+    "LON": 25.2349
+  },
+  "Albania": {
+    "EVENTS": 1449,
+    "FATALITIES": 4,
+    "LAT": 40.6567,
+    "LON": 20.088
+  },
+  "East Timor": {
+    "EVENTS": 85,
+    "FATALITIES": 4,
+    "LAT": -8.5574,
+    "LON": 126.4855
+  },
+  "Norway": {
+    "EVENTS": 2567,
+    "FATALITIES": 4,
+    "LAT": 58.7194,
+    "LON": 8.0351
+  },
+  "Netherlands": {
+    "EVENTS": 5412,
+    "FATALITIES": 4,
+    "LAT": 52.9073,
+    "LON": 6.6878
+  },
+  "Montenegro": {
+    "EVENTS": 1719,
+    "FATALITIES": 3,
+    "LAT": 42.722,
+    "LON": 19.7546
+  },
+  "Slovakia": {
+    "EVENTS": 1232,
+    "FATALITIES": 3,
+    "LAT": 48.5001,
+    "LON": 19.4198
+  },
+  "Portugal": {
+    "EVENTS": 2931,
+    "FATALITIES": 3,
+    "LAT": 40.6785,
+    "LON": -8.52
+  },
+  "Iceland": {
+    "EVENTS": 311,
+    "FATALITIES": 3,
+    "LAT": 64.3316,
+    "LON": -22.0816
+  },
+  "Bulgaria": {
+    "EVENTS": 5010,
+    "FATALITIES": 3,
+    "LAT": 41.75,
+    "LON": 23.488
+  },
+  "Czech Republic": {
+    "EVENTS": 1994,
+    "FATALITIES": 2,
+    "LAT": 50.0602,
+    "LON": 13.8307
+  },
+  "Finland": {
+    "EVENTS": 1900,
+    "FATALITIES": 2,
+    "LAT": 60.2436,
+    "LON": 20.1143
+  },
+  "Sweden": {
+    "EVENTS": 7688,
+    "FATALITIES": 2,
+    "LAT": 56.9947,
+    "LON": 19.0024
+  },
+  "North Macedonia": {
+    "EVENTS": 1502,
+    "FATALITIES": 2,
+    "LAT": 41.6695,
+    "LON": 22.8185
+  },
+  "Malta": {
+    "EVENTS": 411,
+    "FATALITIES": 2,
+    "LAT": 35.904,
+    "LON": 14.4672
+  },
+  "Moldova": {
+    "EVENTS": 2172,
+    "FATALITIES": 2,
+    "LAT": 46.9239,
+    "LON": 29.2496
+  },
+  "Switzerland": {
+    "EVENTS": 1303,
+    "FATALITIES": 2,
+    "LAT": 47.38,
+    "LON": 8.2125
+  },
+  "Lithuania": {
+    "EVENTS": 621,
+    "FATALITIES": 1,
+    "LAT": 54.2297,
+    "LON": 24.079
+  },
+  "Mongolia": {
+    "EVENTS": 775,
+    "FATALITIES": 1,
+    "LAT": 48.0351,
+    "LON": 100.522
+  },
+  "Maldives": {
+    "EVENTS": 419,
+    "FATALITIES": 1,
+    "LAT": -0.6944,
+    "LON": 73.1566
+  },
+  "Japan": {
+    "EVENTS": 14066,
+    "FATALITIES": 1,
+    "LAT": 35.0011,
+    "LON": 137.2772
+  },
+  "Estonia": {
+    "EVENTS": 455,
+    "FATALITIES": 1,
+    "LAT": 58.4069,
+    "LON": 20.0417
+  },
+  "Bhutan": {
+    "EVENTS": 12,
+    "FATALITIES": 1,
+    "LAT": 27.0104,
+    "LON": 89.5484
+  },
+  "Denmark": {
+    "EVENTS": 3137,
+    "FATALITIES": 1,
+    "LAT": 55.1,
+    "LON": 15.7
+  },
+  "Hungary": {
+    "EVENTS": 1458,
+    "FATALITIES": 1,
+    "LAT": 46.5204,
+    "LON": 19.3452
+  },
+  "Vanuatu": {
+    "EVENTS": 15,
+    "FATALITIES": 1,
+    "LAT": -15.374,
+    "LON": 167.8285
+  },
+  "Slovenia": {
+    "EVENTS": 703,
+    "FATALITIES": 1,
+    "LAT": 45.5767,
+    "LON": 13.7464
+  },
+  "New Zealand": {
+    "EVENTS": 1193,
+    "FATALITIES": 1,
+    "LAT": -36.8873,
+    "LON": 174.71
+  },
+  "American Samoa": {
+    "EVENTS": 8,
+    "FATALITIES": 0,
+    "LAT": -14.2649,
+    "LON": -170.663
+  },
+  "Bailiwick of Jersey": {
+    "EVENTS": 18,
+    "FATALITIES": 0,
+    "LAT": 49.2131,
+    "LON": -2.1352
+  },
+  "Bailiwick of Guernsey": {
+    "EVENTS": 13,
+    "FATALITIES": 0,
+    "LAT": 49.4575,
+    "LON": -2.5847
+  },
+  "Christmas Island": {
+    "EVENTS": 2,
+    "FATALITIES": 0,
+    "LAT": -10.4928,
+    "LON": 105.6323
+  },
+  "Cook Islands": {
+    "EVENTS": 7,
+    "FATALITIES": 0,
+    "LAT": -159.7732,
+    "LON": -21.2483
+  },
+  "Liechtenstein": {
+    "EVENTS": 15,
+    "FATALITIES": 0,
+    "LAT": 47.2074,
+    "LON": 9.5226
+  },
+  "Kiribati": {
+    "EVENTS": 3,
+    "FATALITIES": 0,
+    "LAT": 1.356,
+    "LON": 172.9287
+  },
+  "Isle of Man": {
+    "EVENTS": 14,
+    "FATALITIES": 0,
+    "LAT": 54.233,
+    "LON": -4.5502
+  },
+  "Ireland": {
+    "EVENTS": 1879,
+    "FATALITIES": 0,
+    "LAT": 52.6909,
+    "LON": -6.8253
+  },
+  "Gibraltar": {
+    "EVENTS": 5,
+    "FATALITIES": 0,
+    "LAT": 36.1352,
+    "LON": -5.3492
+  },
+  "French Polynesia": {
+    "EVENTS": 171,
+    "FATALITIES": 0,
+    "LAT": -22.4707,
+    "LON": -151.3397
+  },
+  "Guam": {
+    "EVENTS": 68,
+    "FATALITIES": 0,
+    "LAT": 13.4642,
+    "LON": 144.747
+  },
+  "Greenland": {
+    "EVENTS": 60,
+    "FATALITIES": 0,
+    "LAT": 74.9594,
+    "LON": -51.0801
+  },
+  "Fiji": {
+    "EVENTS": 56,
+    "FATALITIES": 0,
+    "LAT": -17.9175,
+    "LON": 178.2782
+  },
+  "Faroe Islands": {
+    "EVENTS": 8,
+    "FATALITIES": 0,
+    "LAT": 62.1277,
+    "LON": -6.9812
+  },
+  "Andorra": {
+    "EVENTS": 31,
+    "FATALITIES": 0,
+    "LAT": 42.4941,
+    "LON": 1.5082
+  },
+  "Antarctica": {
+    "EVENTS": 9,
+    "FATALITIES": 0,
+    "LAT": -81.5608,
+    "LON": -5.8008
+  },
+  "Akrotiri and Dhekelia": {
+    "EVENTS": 22,
+    "FATALITIES": 0,
+    "LAT": 34.6,
+    "LON": 32.9586
+  },
+  "Brunei": {
+    "EVENTS": 2,
+    "FATALITIES": 0,
+    "LAT": 4.8668,
+    "LON": 114.8942
+  },
+  "Monaco": {
+    "EVENTS": 20,
+    "FATALITIES": 0,
+    "LAT": 43.7391,
+    "LON": 7.4256
+  },
+  "Nauru": {
+    "EVENTS": 3,
+    "FATALITIES": 0,
+    "LAT": -0.547,
+    "LON": 166.9223
+  },
+  "Palau": {
+    "EVENTS": 3,
+    "FATALITIES": 0,
+    "LAT": 7.2738,
+    "LON": 134.4332
+  },
+  "Northern Mariana Islands": {
+    "EVENTS": 11,
+    "FATALITIES": 0,
+    "LAT": 15.1941,
+    "LON": 145.7484
+  },
+  "Niue": {
+    "EVENTS": 1,
+    "FATALITIES": 0,
+    "LAT": -19.0502,
+    "LON": -169.8601
+  },
+  "Luxembourg": {
+    "EVENTS": 245,
+    "FATALITIES": 0,
+    "LAT": 49.6344,
+    "LON": 5.9658
+  },
+  "Micronesia": {
+    "EVENTS": 2,
+    "FATALITIES": 0,
+    "LAT": 6.8787,
+    "LON": 158.2332
+  },
+  "Marshall Islands": {
+    "EVENTS": 5,
+    "FATALITIES": 0,
+    "LAT": 7.096,
+    "LON": 171.1129
+  },
+  "Samoa": {
+    "EVENTS": 25,
+    "FATALITIES": 0,
+    "LAT": -13.8813,
+    "LON": -171.9636
+  },
+  "Singapore": {
+    "EVENTS": 35,
+    "FATALITIES": 0,
+    "LAT": 1.3486,
+    "LON": 103.849
+  },
+  "Taiwan": {
+    "EVENTS": 7329,
+    "FATALITIES": 0,
+    "LAT": 23.9911,
+    "LON": 120.4962
+  },
+  "South Korea": {
+    "EVENTS": 46615,
+    "FATALITIES": 0,
+    "LAT": 35.2018,
+    "LON": 129.0779
+  },
+  "San Marino": {
+    "EVENTS": 36,
+    "FATALITIES": 0,
+    "LAT": 43.9462,
+    "LON": 12.4181
+  },
+  "Tokelau": {
+    "EVENTS": 2,
+    "FATALITIES": 0,
+    "LAT": -8.5458,
+    "LON": -172.4687
+  },
+  "Tuvalu": {
+    "EVENTS": 1,
+    "FATALITIES": 0,
+    "LAT": -8.4261,
+    "LON": 179.1201
+  },
+  "Tonga": {
+    "EVENTS": 6,
+    "FATALITIES": 0,
+    "LAT": -21.1678,
+    "LON": -175.2824
+  },
+  "Vatican City": {
+    "EVENTS": 8,
+    "FATALITIES": 0,
+    "LAT": 41.9036,
+    "LON": 12.4525
+  },
+  "Wallis and Futuna": {
+    "EVENTS": 27,
+    "FATALITIES": 0,
+    "LAT": -14.2853,
+    "LON": -178.132
+  }
 }
